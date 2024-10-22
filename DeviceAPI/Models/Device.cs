@@ -7,9 +7,8 @@ namespace DeviceAPI.Models
     public class Device
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("Id")]
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = new Guid();
 
         [Required]
         [MaxLength(500)]

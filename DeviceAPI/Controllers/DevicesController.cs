@@ -24,7 +24,7 @@ namespace DeviceAPI.Controllers
         // GET: api/Devices
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Device>>> GetDevices(string description = "",
-            string address = "", double maxEnCons = 0.0, long ownerId = 0)
+            string address = "", double maxEnCons = 0.0, string ownerId = "")
         {
 
             var query = _context.Device.AsQueryable();
@@ -41,7 +41,7 @@ namespace DeviceAPI.Controllers
             {
                 query = query.Where(d => d.MaxEnergyConsumption == maxEnCons);
             }
-            if (ownerId > 0)
+            if (!ownerId.Equals(""))
             {
                 query = query.Where(d => d.UserId.Equals(ownerId));
             }
@@ -54,7 +54,7 @@ namespace DeviceAPI.Controllers
 
         // GET: api/Devices/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Device>> GetDevice(long id)
+        public async Task<ActionResult<Device>> GetDevice(Guid id)
         {
             var Device = await _context.Device.FindAsync(id);
 
@@ -68,7 +68,7 @@ namespace DeviceAPI.Controllers
 
         // GET: api/devices/user/5
         [HttpGet("/user/{id}")]
-        public async Task<ActionResult<IEnumerable<Device>>> GetDevicesByUser(long userId)
+        public async Task<ActionResult<IEnumerable<Device>>> GetDevicesByUser(Guid userId)
         {
             var Devices = await _context.Device.Where(d => d.UserId.Equals(userId)).ToListAsync();
 
@@ -83,7 +83,7 @@ namespace DeviceAPI.Controllers
         // PUT: api/Devices/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutDevice(long id, Device Device)
+        public async Task<IActionResult> PutDevice(Guid id, Device Device)
         {
             if (!Device.Id.Equals(id))
             {
@@ -124,7 +124,7 @@ namespace DeviceAPI.Controllers
 
         // DELETE: api/Devices/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDevice(long id)
+        public async Task<IActionResult> DeleteDevice(Guid id)
         {
             var Device = await _context.Device.FindAsync(id);
             if (Device == null)
@@ -140,7 +140,7 @@ namespace DeviceAPI.Controllers
 
 
 
-        private bool DeviceExists(long id)
+        private bool DeviceExists(Guid id)
         {
             return _context.Device.Any(e => e.Id.Equals(id));
         }

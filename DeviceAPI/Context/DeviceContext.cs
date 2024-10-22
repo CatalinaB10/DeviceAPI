@@ -12,6 +12,11 @@ namespace DeviceAPI.Context
         }
 
         public DbSet<Device> Device { get; set; } = default!;
-        
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Device>()
+                .HasKey(d => d.Id); // Set GUID as primary key
+        }
     }
 }

@@ -23,10 +23,34 @@ namespace DeviceAPI.Controllers
 
         // GET: api/Devices
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Device>>> GetDevice()
+        public async Task<ActionResult<IEnumerable<Device>>> GetDevices(string description = "",
+            string address = "", double maxEnCons = 0.0, long ownerId = 0)
         {
-            return await _context.Device.ToListAsync();
+
+            var query = _context.Device.AsQueryable();
+
+            if (!string.IsNullOrEmpty(description))
+            {
+                query = query.Where(d => d.Description.Contains(description));
+            }
+            if (!string.IsNullOrEmpty(address))
+            {
+                query = query.Where(d => d.Address.Contains(address));
+            }
+            if (maxEnCons > 0)
+            {
+                query = query.Where(d => d.MaxEnergyConsumption == maxEnCons);
+            }
+            if (ownerId > 0)
+            {
+                query = query.Where(d => d.UserId.Equals(ownerId));
+            }
+
+            var result = await query.ToListAsync();
+            return Ok(result);
+
         }
+
 
         // GET: api/Devices/5
         [HttpGet("{id}")]
@@ -42,12 +66,26 @@ namespace DeviceAPI.Controllers
             return Device;
         }
 
+        // GET: api/devices/user/5
+        [HttpGet("/user/{id}")]
+        public async Task<ActionResult<IEnumerable<Device>>> GetDevicesByUser(long userId)
+        {
+            var Devices = await _context.Device.Where(d => d.UserId.Equals(userId)).ToListAsync();
+
+            if (Devices == null)
+            {
+                return NotFound();
+            }
+
+            return Devices;
+        }
+
         // PUT: api/Devices/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDevice(long id, Device Device)
         {
-            if (id != Device.Id)
+            if (!Device.Id.Equals(id))
             {
                 return BadRequest();
             }
@@ -100,9 +138,11 @@ namespace DeviceAPI.Controllers
             return NoContent();
         }
 
+
+
         private bool DeviceExists(long id)
         {
-            return _context.Device.Any(e => e.Id == id);
+            return _context.Device.Any(e => e.Id.Equals(id));
         }
     }
 }

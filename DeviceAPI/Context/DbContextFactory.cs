@@ -13,7 +13,7 @@ namespace DeviceAPI.Context
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .Build();
-            var conn = configuration.GetConnectionString("DemoContext");
+            var conn = configuration.GetConnectionString("DeviceDbConnString");
 
             optionsBuilder.UseNpgsql(conn);
             return new DeviceContext(optionsBuilder.Options);

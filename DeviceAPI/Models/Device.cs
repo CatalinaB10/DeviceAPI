@@ -9,15 +9,19 @@ namespace DeviceAPI.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("Id")]
-        public long Id { get; set; }
+        public Guid Id { get; set; }
+
         [Required]
         [MaxLength(500)]
+        [Column("Description")]
         public string Description { get; set; }
         [MaxLength(500)]
-        public string Address { get; set; }
-      
+        [Column("Address")]
+        public string? Address { get; set; }
+        [Column("MaxEnergyConsumption")]
         public double MaxEnergyConsumption { get; set; }
-        
-        public virtual long UserId { get; set; }
+
+        [Column("UserId")]
+        public virtual Guid? UserId { get; set; } 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using DeviceAPI.Models;
+using UserAPI.Models;
 
 namespace DeviceAPI.Context
 {
@@ -10,8 +11,7 @@ namespace DeviceAPI.Context
         {
         }
 
-        public DbSet<Device> Devices { get; set; } = null!;
         public DbSet<Device> Device { get; set; } = default!;
-        public DbSet<User> User { get; set; } = default!;
+        
     }
 }

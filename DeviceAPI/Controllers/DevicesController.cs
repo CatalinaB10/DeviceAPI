@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DeviceAPI.Models;
 using DeviceAPI.Context;
+using DeviceAPI.Migrations;
+using UserAPI.Data;
 
 namespace DeviceAPI.Controllers
 {
@@ -15,10 +17,12 @@ namespace DeviceAPI.Controllers
     public class DevicesController : ControllerBase
     {
         private readonly DeviceContext _context;
+        private readonly UserContext _userContext;
 
-        public DevicesController(DeviceContext context)
+        public DevicesController(DeviceContext context, UserContext userContext)
         {
             _context = context;
+            _userContext = userContext;
         }
 
         // GET: api/Devices
@@ -135,10 +139,29 @@ namespace DeviceAPI.Controllers
             _context.Device.Remove(Device);
             await _context.SaveChangesAsync();
 
+            _userContext.Remove(_userContext.Devices.Find(Device.Id));
+            _userContext.SaveChanges();
+
             return NoContent();
         }
 
+        // DELETE CASCADE: api/Devices/DeleteCascade/5
+        [HttpDelete("/DeleteCascade/({id})")]
+        public async Task<IActionResult> DeleteDeviceCascade(Guid id)
+        {
+            var Device = await _context.Device.FindAsync(id);
+            if (Device == null)
+            {
+                return NotFound();
+            }
 
+            _context.Database.ExecuteSqlRaw("CALL delete_device({0})", id);
+            await _context.SaveChangesAsync();
+
+         
+
+            return NoContent();
+        }
 
         private bool DeviceExists(Guid id)
         {

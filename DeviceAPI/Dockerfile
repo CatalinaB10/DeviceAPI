@@ -15,7 +15,7 @@ COPY ["DeviceAPI.csproj", "."]
 RUN dotnet restore "./DeviceAPI.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "./DeviceAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./DeviceAPI.csproj" -c Release -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish

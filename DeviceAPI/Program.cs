@@ -1,5 +1,6 @@
 using Aspire.Hosting;
 using DeviceAPI.Context;
+using DeviceAPI.Services;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -21,6 +22,8 @@ builder.Services.AddHttpClient("DeviceService", client =>
 {
     client.BaseAddress = new Uri("http://localhost:7054/");
 });
+
+//builder.Services.AddScoped<IQueueService, QueueService>();
 
 // builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7045/") });
 

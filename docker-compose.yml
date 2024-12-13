@@ -1,0 +1,44 @@
+services:
+  deviceapi:
+    image: device-img
+    build:
+      context: DeviceAPI
+      dockerfile: Dockerfile
+    networks:
+      - ds-network
+    ports:
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_URLS=http://+:8081
+    depends_on:
+      devices-ds-db:
+        condition: service_healthy
+
+
+  devices-ds-db:
+    image: postgres:latest
+    container_name: devices-ds-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: rox123
+      POSTGRES_DB: DMS
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - psql_data:/var/lib/postgresql/data/
+    networks:
+      - ds-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  psql_data:
+
+networks:
+  ds-network:
+    driver: bridge

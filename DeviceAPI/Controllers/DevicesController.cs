@@ -8,21 +8,26 @@ using Microsoft.EntityFrameworkCore;
 using DeviceAPI.Models;
 using DeviceAPI.Context;
 using DeviceAPI.Migrations;
+using DeviceAPI.Services;
 //using UserAPI.Data;
 
 namespace DeviceAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/deviceapi/api/[controller]")]
     [ApiController]
     public class DevicesController : ControllerBase
     {
         private readonly DeviceContext _context;
-        //private readonly UserContext _userContext;
+        //private readonly IQueueService _queueService;
+        private readonly HttpClient _httpClient;
 
-        public DevicesController(DeviceContext context)
+        public DevicesController(DeviceContext context,
+            //IQueueService queueService,
+            HttpClient httpClient)
         {
             _context = context;
-            //_userContext = userContext;
+            //_queueService = queueService;
+            _httpClient = httpClient;
         }
 
         // GET: api/Devices
@@ -61,7 +66,7 @@ namespace DeviceAPI.Controllers
         public async Task<ActionResult<Device>> GetDevice(Guid id)
         {
             var Device = await _context.Device.FindAsync(id);
-
+            
             if (Device == null)
             {
                 return NotFound();
@@ -112,6 +117,8 @@ namespace DeviceAPI.Controllers
                 }
             }
 
+            //_queueService.SendToQueue(Device, "update");
+
             return Ok(Device);
         }
 
@@ -123,7 +130,9 @@ namespace DeviceAPI.Controllers
             _context.Device.Add(Device);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetDevice), new { id = Device.Id }, Device);
+            //_queueService.SendToQueue(Device, "create");
+
+            return CreatedAtAction(nameof(PostDevice), new { id = Device.Id }, Device);
         }
 
         // DELETE: api/Devices/5
@@ -135,12 +144,13 @@ namespace DeviceAPI.Controllers
             {
                 return NotFound();
             }
+            else
+            {
 
-            _context.Device.Remove(Device);
-            await _context.SaveChangesAsync();
-
-            //_userContext.Remove(_userContext.Devices.Find(Device.Id));
-            //_userContext.SaveChanges();
+                //_queueService.SendToQueue(Device, "delete");
+                _context.Device.Remove(Device);
+                await _context.SaveChangesAsync();
+            }
 
             return NoContent();
         }
